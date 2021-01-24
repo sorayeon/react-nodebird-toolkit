@@ -3,11 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import PostCard from '../../components/PostCard';
-import { initialState as userInitialState } from '../../reducers/user';
-import { initialState as postInitialState } from '../../reducers/post';
-import { loadMyInfoAPI } from '../../actions/user';
-import { loadHashtagPosts, loadHashtagPostsAPI } from '../../actions/post';
+import { loadMyInfo } from '../../actions/user';
+import { loadHashtagPosts } from '../../actions/post';
 import AppLayout from '../../components/AppLayout';
+import wrapper from '../../store/configureStore';
 
 const Hashtag = () => {
   const dispatch = useDispatch();
@@ -43,34 +42,21 @@ const Hashtag = () => {
   );
 };
 
-export async function getServerSideProps(context) {
+// SSR (프론트 서버에서 실행)
+export const getServerSideProps = wrapper.getServerSideProps(async (context) => {
   const cookie = context.req ? context.req.headers.cookie : '';
   axios.defaults.headers.Cookie = '';
+  // 쿠키가 브라우저에 있는경우만 넣어서 실행
+  // (주의, 아래 조건이 없다면 다른 사람으로 로그인 될 수도 있음)
   if (context.req && cookie) {
     axios.defaults.headers.Cookie = cookie;
   }
-  const results = await Promise.allSettled([
-    loadHashtagPostsAPI({ hashtag: context.params.tag }),
-    loadMyInfoAPI(),
-  ]);
-  const [posts, myInfo] = results.map((result) => result.value.data);
+  await context.store.dispatch(loadHashtagPosts({ hashtag: context.params.tag }));
+  await context.store.dispatch(loadMyInfo());
+
   return {
-    props: {
-      initialState: {
-        user: {
-          ...userInitialState,
-          loadMyInfoDone: true,
-          me: myInfo,
-        },
-        post: {
-          ...postInitialState,
-          loadPostsDone: true,
-          mainPosts: posts,
-          hasMorePosts: posts.length === 10,
-        },
-      },
-    },
+    props: {},
   };
-}
+});
 
 export default Hashtag;

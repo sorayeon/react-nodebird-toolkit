@@ -17,7 +17,7 @@ const UserProfile = () => {
     <Card
       actions={[
         <div key="twit">
-          <Link href={`/user/${me.id}`}><a>짹짹<br />{me.Posts.length}</a></Link>
+          <Link href={`/user/${me.id}`}><a>게시글<br />{me.Posts.length}</a></Link>
         </div>,
         <div key="followings">
           <Link href="/profile"><a>팔로잉<br />{me.Followings.length}</a></Link>

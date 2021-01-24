@@ -1,13 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Head from 'next/head';
-import { Provider } from 'react-redux';
 import 'antd/dist/antd.css';
-
-import store from '../store/configureStore';
+import wrapper from '../store/configureStore';
 
 const App = ({ Component, pageProps }) => (
-  <Provider store={store}>
+  <>
     <Head>
       <meta charSet="utf-8" />
       <meta
@@ -18,11 +16,11 @@ const App = ({ Component, pageProps }) => (
       <title>NodeBird</title>
     </Head>
     <Component {...pageProps} />
-  </Provider>
+  </>
 );
 App.propTypes = {
   Component: PropTypes.elementType.isRequired,
   pageProps: PropTypes.any.isRequired,
 };
 // redux, saga 설정
-export default App;
+export default wrapper.withRedux(App);

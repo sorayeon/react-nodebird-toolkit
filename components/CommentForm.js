@@ -11,7 +11,7 @@ import { addComment } from '../actions/post';
 
 const CommentSchema = Yup.object().shape({
   content: Yup.string()
-    .min(5, '답글은 5자 이상 입력하여 주십시오.')
+    .min(3, '답글은 3자 이상 입력하여 주십시오.')
     .required('답글은 필수 입력 항목 입니다.'),
 });
 
@@ -61,7 +61,7 @@ const CommentForm = ({ post }) => {
         </Form.Item>
         <div style={{ position: 'relative', margin: 0 }}>
           <Button
-            style={{ position: 'absolute', right: 0, top: '-20px', zIndex: 1 }}
+            style={{ position: 'absolute', right: 0, top: '-15px', zIndex: 1 }}
             type="primary"
             htmlType="submit"
             loading={addCommentLoading}

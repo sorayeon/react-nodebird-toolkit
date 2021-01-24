@@ -9,9 +9,9 @@ import styled from 'styled-components';
 import { LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
 import Router from 'next/router';
 import axios from 'axios';
-import { initialState as userInitialState } from '../reducers/user';
-import { loadMyInfoAPI, signup } from '../actions/user';
+import { loadMyInfo, signup } from '../actions/user';
 import AppLayout from '../components/AppLayout';
+import wrapper from '../store/configureStore';
 
 const SignupSchema = Yup.object().shape({
   user_email: Yup.string()
@@ -147,7 +147,7 @@ const Signup = () => {
 };
 
 // SSR (프론트 서버에서 실행)
-export async function getServerSideProps(context) {
+export const getServerSideProps = wrapper.getServerSideProps(async (context) => {
   const cookie = context.req ? context.req.headers.cookie : '';
   axios.defaults.headers.Cookie = '';
   // 쿠키가 브라우저에 있는경우만 넣어서 실행
@@ -155,19 +155,10 @@ export async function getServerSideProps(context) {
   if (context.req && cookie) {
     axios.defaults.headers.Cookie = cookie;
   }
-  const results = await Promise.allSettled([loadMyInfoAPI()]);
-  const [myInfo] = results.map((result) => result.value.data);
+  await context.store.dispatch(loadMyInfo());
   return {
-    props: {
-      initialState: {
-        user: {
-          ...userInitialState,
-          loadMyInfoDone: true,
-          me: myInfo,
-        },
-      },
-    },
+    props: {},
   };
-}
+});
 
 export default Signup;

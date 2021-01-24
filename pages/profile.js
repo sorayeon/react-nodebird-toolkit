@@ -8,8 +8,8 @@ import useSWR from 'swr';
 import AppLayout from '../components/AppLayout';
 import FollowList from '../components/FollowList';
 import NicknameEditForm from '../components/NicknameEditForm';
-import { initialState as userInitialState } from '../reducers/user';
-import { loadMyInfoAPI } from '../actions/user';
+import { loadMyInfo } from '../actions/user';
+import wrapper from '../store/configureStore';
 
 const fetcher = (url) => axios.get(url, { withCredentials: true }).then((result) => result.data);
 
@@ -72,7 +72,7 @@ const Profile = () => {
 };
 
 // SSR (프론트 서버에서 실행)
-export async function getServerSideProps(context) {
+export const getServerSideProps = wrapper.getServerSideProps(async (context) => {
   const cookie = context.req ? context.req.headers.cookie : '';
   axios.defaults.headers.Cookie = '';
   // 쿠키가 브라우저에 있는경우만 넣어서 실행
@@ -80,20 +80,11 @@ export async function getServerSideProps(context) {
   if (context.req && cookie) {
     axios.defaults.headers.Cookie = cookie;
   }
+  await context.store.dispatch(loadMyInfo());
 
-  const results = await Promise.allSettled([loadMyInfoAPI()]);
-  const [myInfo] = results.map((result) => result.value.data);
   return {
-    props: {
-      initialState: {
-        user: {
-          ...userInitialState,
-          loadMyInfoDone: true,
-          me: myInfo,
-        },
-      },
-    },
+    props: {},
   };
-}
+});
 
 export default Profile;

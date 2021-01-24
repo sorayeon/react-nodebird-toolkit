@@ -11,11 +11,12 @@ import {
   HeartOutlined,
   HeartTwoTone,
   MessageOutlined,
-  RetweetOutlined,
+  RetweetOutlined, ZoomInOutlined,
 } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import moment from 'moment';
+import Router from 'next/router';
 import PostImages from './PostImages';
 import CommentForm from './CommentForm';
 import CommentList from './CommentList';
@@ -43,6 +44,10 @@ const PostCard = ({ post }) => {
       message.error(JSON.stringify(retweetError, null, 4)).then();
     }
   }, [retweetError]);
+
+  const onZoomPost = useCallback(() => {
+    Router.push(`/post/${post.id}`).then();
+  }, []);
 
   const onLikePost = useCallback(() => {
     if (!id) {
@@ -91,11 +96,12 @@ const PostCard = ({ post }) => {
         cover={post.Images[0] && <PostImages id={post.User.id} images={post.Images} />}
         hoverable
         actions={[
-          <RetweetOutlined key="retweet" onClick={onRetweet} />,
+          <ZoomInOutlined key="zoom" title="자세히" onClick={onZoomPost} />,
+          <RetweetOutlined key="retweet" title="리트윗" onClick={onRetweet} />,
           liked
-            ? <HeartTwoTone twoToneColor="#eb2f96" key="heart" onClick={onUnlikePost} />
-            : <HeartOutlined key="heart" onClick={onLikePost} />,
-          <MessageOutlined key="message" onClick={onToggleComment} />,
+            ? <HeartTwoTone twoToneColor="#eb2f96" title="좋아요" key="heart" onClick={onUnlikePost} />
+            : <HeartOutlined key="heart" title="좋아요" onClick={onLikePost} />,
+          <MessageOutlined key="message" title="댓글" onClick={onToggleComment} />,
           <Popover
             key="more"
             content={(
@@ -138,7 +144,7 @@ const PostCard = ({ post }) => {
           >
             <Card.Meta
               avatar={(
-                <Link href={`/post/${post.RetweetId}`}>
+                <Link href={`/user/${post.Retweet.User.id}`}>
                   <a><Avatar>{post.Retweet.User.nickname[0]}</Avatar></a>
                 </Link>
               )}
@@ -162,7 +168,7 @@ const PostCard = ({ post }) => {
         ) : (
           <Card.Meta
             avatar={(
-              <Link href={`/post/${post.id}`}>
+              <Link href={`/user/${post.User.id}`}>
                 <a><Avatar>{post.User.nickname[0]}</Avatar></a>
               </Link>
             )}

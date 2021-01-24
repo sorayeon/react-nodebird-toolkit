@@ -1,13 +1,27 @@
 import { createSlice } from '@reduxjs/toolkit';
 import _remove from 'lodash/remove';
-import { changeNickname, follow, loadMyInfo, login, logout, removeFollow, signup, unfollow } from '../actions/user';
+import {
+  changeNickname,
+  follow,
+  loadMyInfo,
+  loadUser,
+  login,
+  logout,
+  removeFollow,
+  signup,
+  unfollow
+} from '../actions/user';
 
 // 기본 state
 export const initialState = {
   me: null, // 내 정보
+  userInfo: null, // 유저 정보
   loadMyInfoLoading: false, // 로그인 정보 조회
   loadMyInfoDone: false,
   loadMyInfoError: null,
+  loadUserLoading: false, // 유저 정보 조회
+  loadUserDone: false,
+  loadUserError: null,
   loginLoading: false, // 로그인 시도중
   loginDone: false,
   loginError: null,
@@ -96,6 +110,21 @@ const userSlice = createSlice({
     .addCase(loadMyInfo.rejected, (state, action) => {
       state.loadMyInfoLoading = false;
       state.loadMyInfoError = action.payload;
+    })
+    // loadUser
+    .addCase(loadUser.pending, (state) => {
+      state.loadUserLoading = true;
+      state.loadUserDone = false;
+      state.loadUserError = null;
+    })
+    .addCase(loadUser.fulfilled, (state, action) => {
+      state.loadUserLoading = false;
+      state.loadUserDone = true;
+      state.userInfo = action.payload;
+    })
+    .addCase(loadUser.rejected, (state, action) => {
+      state.loadUserLoading = false;
+      state.loadUserError = action.payload;
     })
     // changeNickname
     .addCase(changeNickname.pending, (state) => {

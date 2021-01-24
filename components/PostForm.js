@@ -13,7 +13,7 @@ import { imageUrl } from '../config/config';
 
 const PostSchema = Yup.object().shape({
   content: Yup.string()
-    .min(5, '게시글은 5자 이상 입력하여 주십시오.')
+    .min(3, '게시글은 3자 이상 입력하여 주십시오.')
     .required('게시글은 필수 입력 항목 입니다.'),
 });
 
@@ -75,7 +75,7 @@ const PostForm = () => {
       }}
     >
       <Form
-        style={{ marginBottom: '20px' }}
+        style={{ marginBottom: 45 }}
         encType="multipart/form-data"
       >
         <Form.Item name="content">
@@ -86,22 +86,20 @@ const PostForm = () => {
             autoSize={{ minRows: 3, maxRows: 5 }}
             placeholder="어떤 신기한 일이 있었나요?"
           />
-        </Form.Item>
-        <div>
           <input type="file" name="image" multiple hidden ref={imageInput} onChange={onChangeImages} />
-        </div>
-        <div style={{ marginTop: '5px', overflow: 'hidden' }}>
+        </Form.Item>
+        <div style={{ position: 'relative', margin: 0 }}>
           <Button
             onClick={onClickImageUpload}
-            style={{ float: 'left' }}
+            style={{ position: 'absolute', right: 80, bottom: '-15px' }}
           >
-            <UploadOutlined /> Click to Upload
+            <UploadOutlined /> Images Upload
           </Button>
           <Button
             type="primary"
-            style={{ float: 'right' }}
             htmlType="submit"
             loading={addPostLoading}
+            style={{ position: 'absolute', right: 0, bottom: '-15px' }}
           >
             올리기
           </Button>

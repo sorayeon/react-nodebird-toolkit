@@ -22,6 +22,9 @@ const Global = createGlobalStyle`
   .ant-col:last-child {
     margin-right: 0 !important;
   }
+  .ant-form-item-explain-error {
+    font-size: 11px;
+  }
 `;
 const SearchInput = styled(Input.Search)`
   vertical-align: middle;

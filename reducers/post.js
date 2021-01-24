@@ -7,6 +7,7 @@ import {
   addPost,
   likePost,
   loadHashtagPosts,
+  loadPost,
   loadPosts,
   loadUserPosts,
   removePost,
@@ -230,6 +231,22 @@ const postSlice = createSlice({
     .addCase(updatePost.rejected, (state, action) => {
       state.updatePostLoading = false;
       state.updatePostError = action.error.message;
+    })
+    // loadPost
+    .addCase(loadPost.pending, (state) => {
+      state.loadPostsLoading = true;
+      state.loadPostsDone = false;
+      state.loadPostsError = null;
+    })
+    .addCase(loadPost.fulfilled, (state, action) => {
+      console.log(action.payload);
+      state.loadPostsLoading = false;
+      state.loadPostsDone = true;
+      state.singlePost = action.payload;
+    })
+    .addCase(loadPost.rejected, (state, action) => {
+      state.loadPostsLoading = false;
+      state.loadPostsError = action.error.message;
     })
     .addDefaultCase((state) => state),
 });

@@ -5,12 +5,11 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import Link from 'next/link';
-import { initialState as postInitialState } from '../../reducers/post';
-import { initialState as userInitialState } from '../../reducers/user';
-import { loadUserPosts, loadUserPostsAPI } from '../../actions/post';
-import { loadMyInfoAPI } from '../../actions/user';
+import { loadUserPosts } from '../../actions/post';
+import { loadMyInfo, loadUser } from '../../actions/user';
 import PostCard from '../../components/PostCard';
 import AppLayout from '../../components/AppLayout';
+import wrapper from '../../store/configureStore';
 
 const User = () => {
   const dispatch = useDispatch();
@@ -93,34 +92,22 @@ const User = () => {
   );
 };
 
-export async function getServerSideProps(context) {
+// SSR (프론트 서버에서 실행)
+export const getServerSideProps = wrapper.getServerSideProps(async (context) => {
   const cookie = context.req ? context.req.headers.cookie : '';
   axios.defaults.headers.Cookie = '';
+  // 쿠키가 브라우저에 있는경우만 넣어서 실행
+  // (주의, 아래 조건이 없다면 다른 사람으로 로그인 될 수도 있음)
   if (context.req && cookie) {
     axios.defaults.headers.Cookie = cookie;
   }
-  const results = await Promise.allSettled([
-    loadUserPostsAPI({ userId: context.params.id }),
-    loadMyInfoAPI(),
-  ]);
-  const [posts, myInfo] = results.map((result) => result.value.data);
+  await context.store.dispatch(loadUserPosts({ userId: context.params.id }));
+  await context.store.dispatch(loadUser({ userId: context.params.id }));
+  await context.store.dispatch(loadMyInfo());
+
   return {
-    props: {
-      initialState: {
-        user: {
-          ...userInitialState,
-          loadMyInfoDone: true,
-          me: myInfo,
-        },
-        post: {
-          ...postInitialState,
-          loadPostsDone: true,
-          mainPosts: posts,
-          hasMorePosts: posts.length === 10,
-        },
-      },
-    },
+    props: {},
   };
-}
+});
 
 export default User;
